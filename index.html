@@ -90,7 +90,6 @@
 const LOGO="https://res.cloudinary.com/dqqeavica/image/upload/v1756743104/secretaria_de_Transito_nxsvyp.jpg";
 const CODIGOS = ["STT0911", "STT1011", "STT1109"];
 const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPYBJQJB9Z1hObioee01pL2SA_mVj5Rmdzmef8nJUAoM1w_w44cMizX1z5iTANS8E/exec";
-const PROXY_URL = "https://transito-proxy.vercel.app/api/proxy"; // <-- Cambia si tu proxy tiene otra URL
 
 const GENEROS = [
   {
@@ -382,44 +381,22 @@ function guardarDatosCertificado(formData) {
   const anio = fechaObj.getFullYear();
   const fecha = `${dia}/${mes}/${anio}`;
 
-  // ENVIAR AL PROXY en vez de al Google Script directo
-  fetch(PROXY_URL, {
+  fetch(APP_SCRIPT_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      url: APP_SCRIPT_URL,
-      method: "POST",
-      body: {
-        fecha: fecha,
-        nombre: formData.nombre,
-        documento: formData.documento,
-        correo: formData.correo || "",
-        dia: dia,
-        mes: mes,
-        genero: formData.genero || ""
-      }
+      fecha: fecha,
+      nombre: formData.nombre,
+      documento: formData.documento,
+      correo: formData.correo || "",
+      dia: dia,
+      mes: mes,
+      genero: formData.genero || ""
     })
   })
   .then(r => r.json())
   .then(data => {
-    if (data.success) {
-      if (!formData.correo && data.pdf) {
-        // Descargar PDF directo
-        const link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,' + data.pdf;
-        link.download = data.filename || "certificado.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-      mostrarCertificado(formData);
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al guardar',
-        text: 'No se pudo guardar la certificación. Intenta de nuevo o contacta soporte.'
-      });
-    }
+    mostrarCertificado(formData);
   })
   .catch(()=>{
     Swal.fire({
