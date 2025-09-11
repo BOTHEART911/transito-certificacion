@@ -1,28 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <!-- ================== META BÁSICA ================== -->
   <meta charset="UTF-8">
   <title>¡Certifícate!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Favicon -->
+
+  <!-- ================== FAVICON ================== -->
   <link rel="icon" href="https://res.cloudinary.com/dqqeavica/image/upload/v1756743104/Logo_rkja6o.png" type="image/png">
-  <!-- TailwindCSS -->
+
+  <!-- ================== LIBRERÍAS ================== -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- ================== ESTILOS PERSONALIZADOS ================== -->
   <style>
+    /* SweetAlert responsive */
     .swal2-responsive-popup { max-width:95vw !important; }
-    .game-btn:active { transform: scale(0.98);}
-    .copyright { font-size:0.95em; color:#888; margin-top:1em;}
-    .field-label { font-weight: bold; color: #374151; margin-bottom: 0.3em; }
-    .input { border-radius: 0.8em; border: 2px solid #e0e7ff; padding: 0.8em 1em; width: 100%; }
-    .input:focus { outline:none; border-color:#fbbf24; box-shadow:0 0 0 2px #fde04788; }
+
+    /* Botón con ligera retroalimentación */
+    .game-btn:active { transform: scale(0.98); }
+
+    /* Texto de copyright */
+    .copyright { font-size:0.95em; color:#888; margin-top:1em; }
+
+    /* Etiquetas de campos */
+    .field-label {
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 0.3em;
+      display: block;
+    }
+
+    /* Inputs */
+    .input {
+      border-radius: 0.8em;
+      border: 2px solid #e0e7ff;
+      padding: 0.8em 1em;
+      width: 100%;
+      transition: border-color .2s, box-shadow .2s;
+      background: #fff;
+    }
+    .input:focus {
+      outline:none;
+      border-color:#fbbf24;
+      box-shadow:0 0 0 2px #fde04788;
+    }
+
+    /* Confetti container */
     .confetti {
       position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
       z-index: 100;
       overflow: hidden;
     }
+
+    /* Pieza individual de confetti */
     .confetti-piece {
       position: absolute;
       width: 14px; height: 14px;
@@ -30,11 +66,15 @@
       opacity: 0.85;
       animation: confetti-fall 1.8s cubic-bezier(.62,.02,.37,.99) forwards;
     }
+
+    /* Animación del confetti */
     @keyframes confetti-fall {
-      0% { transform: translateY(-20px) rotate(0deg); opacity: 1;}
-      80% { opacity: 1;}
-      100% { transform: translateY(90vh) rotate(360deg); opacity: 0;}
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(90vh) rotate(360deg); opacity: 0; }
     }
+
+    /* Imagen institucional */
     .tránsito-entity-img {
       width: 64px;
       max-width: 22vw;
@@ -45,6 +85,8 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    /* Avatares de género */
     .genero-img {
       width: 82px;
       height: 110px;
@@ -62,6 +104,7 @@
       border-color: #22c55e;
       box-shadow: 0 0 0 5px #bbf7d0;
     }
+
     .genero-label {
       text-align: center;
       font-weight: bold;
@@ -70,430 +113,466 @@
       font-size: 1.08em;
       letter-spacing: 1px;
     }
-    .genero-group { display: flex; gap: 32px; justify-content: center; margin-bottom: 1em;}
+
+    .genero-group {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      margin-bottom: 1em;
+    }
+
+    /* Responsivo */
     @media (max-width:600px) {
-      .genero-img { width: 56px; height: 75px;}
-      .tránsito-entity-img { width: 36px;}
+      .genero-img { width: 56px; height: 75px; }
+      .tránsito-entity-img { width: 36px; }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-blue-100 to-yellow-100">
 
-  
-<div id="app" class="w-full max-w-md mx-auto mt-8"></div>
-<div id="confetti"></div>
-<!-- SONIDOS -->
-<audio id="audio-bien" src="https://res.cloudinary.com/dqqeavica/video/upload/v1756844320/correcto_svttl1.mp3" preload="auto"></audio>
-<audio id="audio-mal" src="https://res.cloudinary.com/dqqeavica/video/upload/v1756844319/incorrecto_h5vgbl.mp3" preload="auto"></audio>
+  <!-- Contenedor dinámico -->
+  <div id="app" class="w-full max-w-md mx-auto mt-8"></div>
 
-<script>
-const LOGO="https://res.cloudinary.com/dqqeavica/image/upload/v1756743104/secretaria_de_Transito_nxsvyp.jpg";
-const CODIGOS = ["STT0911", "STT1011", "STT1109"];
-const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwbP1t56uItBdurcPwQ4KNCrbWJWrJz7U-FpXdlUYiTKwsPXUQbt8Q0TuM83VrwWmE/exec";
+  <!-- Confetti -->
+  <div id="confetti"></div>
 
-const GENEROS = [
-  {
-    nombre: "Niño",
-    valor: "Héroe",
-    img: "https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png"
-  },
-  {
-    nombre: "Niña",
-    valor: "Heroína",
-    img: "https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png"
-  }
-];
+  <!-- Audios -->
+  <audio id="audio-bien" src="https://res.cloudinary.com/dqqeavica/video/upload/v1756844320/correcto_svttl1.mp3" preload="auto"></audio>
+  <audio id="audio-mal"  src="https://res.cloudinary.com/dqqeavica/video/upload/v1756844319/incorrecto_h5vgbl.mp3" preload="auto"></audio>
 
-function playSound(id) {
-  const audio = document.getElementById(id);
-  if (audio) { audio.currentTime=0; audio.play(); }
-}
+  <!-- ================== LÓGICA JS ================== -->
+  <script>
+    /* -------------------------------------------------
+       CONSTANTES / CONFIGURACIÓN
+    --------------------------------------------------- */
+    const LOGO = "https://res.cloudinary.com/dqqeavica/image/upload/v1756743104/secretaria_de_Transito_nxsvyp.jpg";
+    const CODIGOS = ["STT0911","STT1011","STT1109"];
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwbP1t56uItBdurcPwQ4KNCrbWJWrJz7U-FpXdlUYiTKwsPXUQbt8Q0TuM83VrwWmE/exec";
 
-function lanzarConfetti() {
-  const colors = ["#fde047","#fbbf24","#10b981","#38bdf8","#f472b6","#6366f1","#f43f5e"];
-  const confettiContainer = document.getElementById('confetti');
-  confettiContainer.innerHTML = '';
-  confettiContainer.className = 'confetti';
-  for(let i=0; i<70; i++){
-    const div = document.createElement('div');
-    div.className = 'confetti-piece';
-    div.style.background = colors[Math.floor(Math.random()*colors.length)];
-    div.style.left = Math.random()*99+'vw';
-    div.style.top = (Math.random()*10)+'vh';
-    div.style.transform = `rotate(${Math.random()*360}deg)`;
-    div.style.animationDelay = (Math.random()*0.7)+'s';
-    confettiContainer.appendChild(div);
-  }
-  setTimeout(()=>{ confettiContainer.innerHTML=''; }, 1900);
-}
+    const GENEROS = [
+      { nombre:"Niño", valor:"Héroe",   img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png" },
+      { nombre:"Niña", valor:"Heroína", img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png" }
+    ];
 
-function renderVistaInicial() {
-  document.getElementById('app').innerHTML = `
-    <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center">
-      <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-1" />
-      <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-yellow-600 text-center">Haz terminado esta aventura vial</h1>
-      <div class="mb-4 text-lg text-gray-700 text-center">
-        Es momento de certificarte como héroe o heroína vial.<br>
-        Por favor ingresa tus <span class="font-bold text-green-600">3 códigos de ganador</span>
-      </div>
-      <form id="codigosForm" class="w-full flex flex-col gap-4 mb-5">
-        <div>
-          <label for="codigo1" class="field-label">Código Ganador 1</label>
-          <input type="text" id="codigo1" class="input" maxlength="16" placeholder="Ingresa el primer código">
-        </div>
-        <div>
-          <label for="codigo2" class="field-label">Código Ganador 2</label>
-          <input type="text" id="codigo2" class="input" maxlength="16" placeholder="Ingresa el segundo código">
-        </div>
-        <div>
-          <label for="codigo3" class="field-label">Código Ganador 3</label>
-          <input type="text" id="codigo3" class="input" maxlength="16" placeholder="Ingresa el tercer código">
-        </div>
-        <button id="validarBtn" type="button" class="game-btn bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-xl shadow-xl text-xl mt-2" disabled>Validar</button>
-      </form>
-      <div class="text-xs text-gray-400 mt-4">Copyright © Oscar Polania – Sec. Tránsito del Tolima</div>
-    </div>
-  `;
-  ['codigo1','codigo2','codigo3'].forEach(id=>{
-    document.getElementById(id).addEventListener('input', habilitarValidar);
-  });
-  document.getElementById('validarBtn').addEventListener('click', validarCodigos);
-  habilitarValidar();
-}
-function habilitarValidar() {
-  const v1 = document.getElementById('codigo1').value.trim();
-  const v2 = document.getElementById('codigo2').value.trim();
-  const v3 = document.getElementById('codigo3').value.trim();
-  document.getElementById('validarBtn').disabled = !(v1 && v2 && v3);
-}
-function validarCodigos() {
-  const v1 = document.getElementById('codigo1').value.trim().toUpperCase();
-  const v2 = document.getElementById('codigo2').value.trim().toUpperCase();
-  const v3 = document.getElementById('codigo3').value.trim().toUpperCase();
-  if (v1 === CODIGOS[0] && v2 === CODIGOS[1] && v3 === CODIGOS[2]) {
-    playSound("audio-bien");
-    lanzarConfetti();
-    setTimeout(abrirFormularioCertificacion, 800); // Pequeña pausa para permitir el efecto
-  } else {
-    playSound("audio-mal");
-    Swal.fire({
-      icon: 'error',
-      title: 'Código Incorrecto',
-      text: 'Revisa muy bien e intenta de nuevo.',
-      confirmButtonText: 'Editar'
-    });
-  }
-}
+    // Flag para evitar dobles envíos mientras se procesa
+    let procesando = false;
 
-function abrirFormularioCertificacion() {
-  let selectedGenero = null;
-  document.getElementById('app').innerHTML = `
-    <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center">
-      <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-1" />
-      <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-green-700 text-center">Genera tu Certificación</h2>
-      <form id="certForm" class="w-full flex flex-col gap-4 mb-5">
-        <div>
-          <label class="field-label mb-2">Selecciona tu género</label>
-          <div class="genero-group" id="generoGroup">
-            ${GENEROS.map((g,i)=>`
-              <div>
-                <img src="${g.img}" class="genero-img" data-genero="${g.valor}" data-index="${i}" id="genero-img-${i}" alt="${g.nombre}">
-                <div class="genero-label">${g.nombre}</div>
-              </div>
-            `).join('')}
+    /* -------------------------------------------------
+       UTILIDADES
+    --------------------------------------------------- */
+    function playSound(id){
+      const audio = document.getElementById(id);
+      if(audio){
+        audio.currentTime = 0;
+        audio.play();
+      }
+    }
+
+    function lanzarConfetti(){
+      const colors = ["#fde047","#fbbf24","#10b981","#38bdf8","#f472b6","#6366f1","#f43f5e"];
+      const confettiContainer = document.getElementById('confetti');
+      confettiContainer.innerHTML = '';
+      confettiContainer.className = 'confetti';
+
+      for(let i=0;i<70;i++){
+        const div = document.createElement('div');
+        div.className = 'confetti-piece';
+        div.style.background = colors[Math.floor(Math.random()*colors.length)];
+        div.style.left = Math.random()*99 + 'vw';
+        div.style.top  = (Math.random()*10) + 'vh';
+        div.style.transform = `rotate(${Math.random()*360}deg)`;
+        div.style.animationDelay = (Math.random()*0.7)+'s';
+        confettiContainer.appendChild(div);
+      }
+
+      setTimeout(()=>{ confettiContainer.innerHTML=''; }, 1900);
+    }
+
+    /* -------------------------------------------------
+       VISTA INICIAL (Ingreso de Códigos)
+    --------------------------------------------------- */
+    function renderVistaInicial(){
+      document.getElementById('app').innerHTML = `
+        <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center">
+          <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-1" />
+          <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-yellow-600 text-center">
+            Haz terminado esta aventura vial
+          </h1>
+          <div class="mb-4 text-lg text-gray-700 text-center">
+            Es momento de certificarte como héroe o heroína vial.<br>
+            Por favor ingresa tus <span class="font-bold text-green-600">3 códigos de ganador</span>
+          </div>
+          <form id="codigosForm" class="w-full flex flex-col gap-4 mb-5">
+            <div>
+              <label for="codigo1" class="field-label">Código Ganador 1</label>
+              <input type="text" id="codigo1" class="input" maxlength="16" placeholder="Ingresa el primer código">
+            </div>
+            <div>
+              <label for="codigo2" class="field-label">Código Ganador 2</label>
+              <input type="text" id="codigo2" class="input" maxlength="16" placeholder="Ingresa el segundo código">
+            </div>
+            <div>
+              <label for="codigo3" class="field-label">Código Ganador 3</label>
+              <input type="text" id="codigo3" class="input" maxlength="16" placeholder="Ingresa el tercer código">
+            </div>
+            <button id="validarBtn" type="button"
+              class="game-btn bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-xl shadow-xl text-xl mt-2"
+              disabled>Validar</button>
+          </form>
+          <div class="text-xs text-gray-400 mt-4">
+            Copyright © Oscar Polania – Sec. Tránsito del Tolima
           </div>
         </div>
-        <div>
-          <label for="nombre" class="field-label">Ingresa tu nombre completo</label>
-          <input type="text" id="nombre" class="input" maxlength="50" placeholder="Ingresa tu nombre completo" autocomplete="off">
-        </div>
-        <div>
-          <label for="documento" class="field-label">N° de Documento</label>
-          <input type="text" id="documento" class="input" maxlength="10" placeholder="Sin puntos ni espacios" autocomplete="off">
-        </div>
-        <div>
-          <label for="dispositivo" class="field-label">¿Estás en tu Dispositivo?</label>
-          <select id="dispositivo" class="input">
-            <option value="">Selecciona...</option>
-            <option value="SI">SI</option>
-            <option value="NO">NO</option>
-          </select>
-        </div>
-        <div id="correoDiv" style="display:none;">
-          <label for="correo" class="field-label">Correo de uno de tus padres</label>
-          <input type="email" id="correo" class="input" maxlength="60" placeholder="Corrobora con tus padres el correo" autocomplete="off">
-        </div>
-        <button id="guardarBtn" type="button" class="game-btn bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-xl shadow-xl text-xl mt-2">Guardar</button>
-      </form>
-      <div class="text-xs text-gray-400 mt-4">Copyright © Oscar Polania – Sec. Tránsito del Tolima</div>
-    </div>
-  `;
+      `;
 
-  // Dinámica de género
-  const imgs = document.querySelectorAll('.genero-img');
-  imgs.forEach((img, idx) => {
-    img.addEventListener('click', () => {
-      imgs.forEach(i => i.classList.remove('selected'));
-      img.classList.add('selected');
-      selectedGenero = {
-        valor: GENEROS[idx].valor,
-        nombre: GENEROS[idx].nombre,
-        img: GENEROS[idx].img
-      };
-    });
-  });
-
-  // Mostrar/ocultar correo
-  document.getElementById('dispositivo').addEventListener('change', function() {
-    document.getElementById('correoDiv').style.display = this.value === 'SI' ? '' : 'none';
-  });
-
-  // Validar y guardar
-  document.getElementById('guardarBtn').addEventListener('click', function() {
-    validarYResumen(selectedGenero);
-  });
-}
-
-function validarYResumen(selectedGenero) {
-  const nombre = document.getElementById('nombre').value.trim().toUpperCase();
-  const documento = document.getElementById('documento').value.trim();
-  const dispositivo = document.getElementById('dispositivo').value;
-  const correo = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
-
-  const documentoRegex = /^[0-9]{10}$/;
-  const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
-  const guardarBtn = document.getElementById('guardarBtn');
-  guardarBtn.disabled = true;
-
-  // Validar género
-  if (!selectedGenero || !selectedGenero.valor) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Selecciona tu género',
-      text: 'Por favor, selecciona una opción.',
-      confirmButtonText: 'Editar',
-      width: '80%',
-      padding: '1rem',
-      customClass: { popup: 'swal2-responsive-popup' }
-    }).then(() => { guardarBtn.disabled = false; });
-    return;
-  }
-  // Validar nombre
-  if (!nombre || nombre.length < 5) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Nombre Incompleto',
-      text: 'Por favor, ingresa tu nombre completo.',
-      confirmButtonText: 'Editar',
-      width: '80%',
-      padding: '1rem',
-      customClass: { popup: 'swal2-responsive-popup' }
-    }).then(() => { document.getElementById('nombre').focus(); guardarBtn.disabled = false; });
-    return;
-  }
-  // Validar documento
-  if (!documentoRegex.test(documento)) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Documento Errado',
-      text: '',
-      html: `Por favor, ingresa correctamente tu número de Documento<br><br>
-        <div class="copyright">
-            Copyright © Oscar Polania – Sec. Tránsito del Tolima
-        </div>`,
-      confirmButtonText: 'Editar',
-      width: '80%',
-      padding: '1rem',
-      customClass: { popup: 'swal2-responsive-popup' }
-    }).then(() => {
-      document.getElementById('documento').focus();
-      guardarBtn.disabled = false;
-    });
-    return;
-  }
-  // Validar correo solo si debe diligenciarse
-  if (dispositivo === 'SI') {
-    if (!correo) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Correo Requerido',
-        text: 'Por favor, ingresa el correo de uno de tus padres.',
-        confirmButtonText: 'Editar'
-      }).then(() => {
-        document.getElementById('correo').focus();
-        guardarBtn.disabled = false;
+      ['codigo1','codigo2','codigo3'].forEach(id=>{
+        document.getElementById(id).addEventListener('input', habilitarValidar);
       });
-      return;
-    } else if (!correoRegex.test(correo)) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Correo Errado',
-        text: '',
-        html: `Por favor, ingresa un correo electrónico válido<br><br>
-        <div class="copyright">
-            Copyright © Oscar Polania – Sec. Tránsito del Tolima
-        </div>`,
-        confirmButtonText: 'Editar',
-        width: '80%',
-        padding: '1rem',
-        customClass: { popup: 'swal2-responsive-popup' }
-      }).then(() => {
-        document.getElementById('correo').focus();
-        guardarBtn.disabled = false;
-      });
-      return;
+      document.getElementById('validarBtn').addEventListener('click', validarCodigos);
+      habilitarValidar();
     }
-  }
 
-  // Mostrar resumen antes de guardar
-  let htmlResumen = `
-    <div class="mb-2 text-lg text-green-700 font-bold">Resumen de tu Certificación</div>
-    <div><b>Nombre:</b> ${nombre}</div>
-    <div><b>Documento:</b> ${documento}</div>
-    <div><b>Género:</b> ${selectedGenero ? selectedGenero.valor : ""}</div>
-    <div><b>¿En el dispositivo?:</b> ${dispositivo}</div>
-    ${dispositivo === 'SI' ? `<div><b>Correo:</b> ${correo}</div>` : ''}
-  `;
-  Swal.fire({
-    icon: 'info',
-    title: '¿Confirmar Certificación?',
-    html: htmlResumen,
-    showCancelButton: true,
-    confirmButtonText: 'Confirmar',
-    cancelButtonText: 'Editar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      guardarDatosCertificado({
-        nombre, documento, dispositivo, correo,
-        genero: selectedGenero ? selectedGenero.valor : ""
-      });
-    } else {
-      guardarBtn.disabled = false;
+    function habilitarValidar(){
+      const v1 = document.getElementById('codigo1').value.trim();
+      const v2 = document.getElementById('codigo2').value.trim();
+      const v3 = document.getElementById('codigo3').value.trim();
+      document.getElementById('validarBtn').disabled = !(v1 && v2 && v3);
     }
-  });
-}
 
-// SOLO CAMBIA ESTA FUNCIÓN PARA USAR EL PROXY:
-function guardarDatosCertificado(formData) {
-  const fechaObj = new Date();
-  const dia = String(fechaObj.getDate()).padStart(2, '0');
-  const mes = String(fechaObj.getMonth()+1).padStart(2, '0');
-  const anio = fechaObj.getFullYear();
-  const fecha = `${dia}/${mes}/${anio}`;
+    function validarCodigos(){
+      const v1 = document.getElementById('codigo1').value.trim().toUpperCase();
+      const v2 = document.getElementById('codigo2').value.trim().toUpperCase();
+      const v3 = document.getElementById('codigo3').value.trim().toUpperCase();
 
-  const params = new URLSearchParams({
-    fecha,
-    nombre: formData.nombre,
-    documento: formData.documento,
-    correo: formData.correo || "",
-    dia,
-    mes,
-    genero: formData.genero || ""
-  });
-
-  fetch(APP_SCRIPT_URL, {
-    method: 'POST',
-    body: params // SIN headers -> evita preflight
-  })
-  .then(r => r.text())               // Apps Script responde texto
-  .then(txt => {
-    let data = {};
-    try { data = JSON.parse(txt); } catch(e){}
-    if (data.success) {
-      if (!formData.correo && data.pdf) {
-        // Descargar PDF (Base64)
-        const link = document.createElement('a');
-        link.href = 'data:application/pdf;base64,' + data.pdf;
-        link.download = data.filename || "certificado.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      if(v1===CODIGOS[0] && v2===CODIGOS[1] && v3===CODIGOS[2]){
+        playSound("audio-bien");
+        lanzarConfetti();
+        setTimeout(abrirFormularioCertificacion, 800);
+      } else {
+        playSound("audio-mal");
+        Swal.fire({
+          icon:'error',
+          title:'Código Incorrecto',
+          text:'Revisa muy bien e intenta de nuevo.',
+          confirmButtonText:'Editar'
+        });
       }
-      mostrarCertificado(formData);
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al guardar',
-        text: data.error || 'No se pudo guardar.'
+    }
+
+    /* -------------------------------------------------
+       FORMULARIO DE CERTIFICACIÓN
+    --------------------------------------------------- */
+    function abrirFormularioCertificacion(){
+      let selectedGenero = null;
+
+      document.getElementById('app').innerHTML = `
+        <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center">
+          <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-1" />
+          <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-green-700 text-center">
+            Genera tu Certificación
+          </h2>
+          <form id="certForm" class="w-full flex flex-col gap-4 mb-5">
+            <div>
+              <label class="field-label mb-2">Selecciona tu género</label>
+              <div class="genero-group" id="generoGroup">
+                ${GENEROS.map((g,i)=>`
+                  <div>
+                    <img src="${g.img}" class="genero-img" data-genero="${g.valor}" data-index="${i}"
+                         id="genero-img-${i}" alt="${g.nombre}">
+                    <div class="genero-label">${g.nombre}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div>
+              <label for="nombre" class="field-label">Ingresa tu nombre completo</label>
+              <input type="text" id="nombre" class="input" maxlength="50"
+                     placeholder="Ingresa tu nombre completo" autocomplete="off">
+            </div>
+            <div>
+              <label for="documento" class="field-label">N° de Documento</label>
+              <input type="text" id="documento" class="input" maxlength="10"
+                     placeholder="Sin puntos ni espacios" autocomplete="off">
+            </div>
+            <div>
+              <label for="dispositivo" class="field-label">¿Estás en tu Dispositivo?</label>
+              <select id="dispositivo" class="input">
+                <option value="">Selecciona...</option>
+                <option value="SI">SI</option>
+                <option value="NO">NO</option>
+              </select>
+            </div>
+            <div id="correoDiv" style="display:none;">
+              <label for="correo" class="field-label">Correo de uno de tus padres</label>
+              <input type="email" id="correo" class="input" maxlength="60"
+                     placeholder="Corrobora con tus padres el correo" autocomplete="off">
+            </div>
+            <button id="guardarBtn" type="button"
+              class="game-btn bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-xl shadow-xl text-xl mt-2">
+              Guardar
+            </button>
+          </form>
+          <div class="text-xs text-gray-400 mt-4">
+            Copyright © Oscar Polania – Sec. Tránsito del Tolima
+          </div>
+        </div>
+      `;
+
+      // Selección de género
+      document.querySelectorAll('.genero-img').forEach((img, idx)=>{
+        img.addEventListener('click', ()=>{
+          document.querySelectorAll('.genero-img').forEach(i=>i.classList.remove('selected'));
+          img.classList.add('selected');
+          selectedGenero = {
+            valor: GENEROS[idx].valor,
+            nombre: GENEROS[idx].nombre,
+            img: GENEROS[idx].img
+          };
+        });
+      });
+
+      // Mostrar correo solo si "SI"
+      document.getElementById('dispositivo').addEventListener('change', function(){
+        document.getElementById('correoDiv').style.display = this.value === 'SI' ? '' : 'none';
+      });
+
+      // Click guardar
+      document.getElementById('guardarBtn').addEventListener('click', ()=>{
+        validarYResumen(selectedGenero);
       });
     }
-  })
-  .catch(() => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error de conexión',
-      text: 'No se pudo conectar con el servidor. Intenta en unos minutos.'
-    });
-  });
-}
 
-function mostrarCertificado(formData) {
-  const htmlBase = formData.correo
-    ? `Tu certificado ha sido enviado al correo: <b>${formData.correo}</b><br><br>`
-    : `Tu certificado se está descargando en tu dispositivo.<br><br>`;
+    /* -------------------------------------------------
+       VALIDACIÓN + RESUMEN + CONFIRMACIÓN
+    --------------------------------------------------- */
+    function validarYResumen(selectedGenero){
+      const nombre      = document.getElementById('nombre').value.trim().toUpperCase();
+      const documento   = document.getElementById('documento').value.trim();
+      const dispositivo = document.getElementById('dispositivo').value;
+      const correo      = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
 
-  Swal.fire({
-    icon: 'success',
-    title: '¡Certificación Generada!',
-    html: `${htmlBase}
-      <div class="copyright">
-        Copyright © Oscar Polania – Sec. Tránsito del Tolima
-      </div>`,
-    confirmButtonText: 'OK'
-  }).then(() => {
-    mostrarMision(); // Ir a la segunda alerta (misión)
-  });
-}
+      const documentoRegex = /^[0-9]{10}$/;
+      const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
-function mostrarMision() {
-  Swal.fire({
-    title: '¡Ahora tienes una misión muy importante!',
-    html: `
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-        <div style="font-size:1.05rem; line-height:1.35rem; font-weight:500; color:#374151; text-align:center;">
-          Compartir tu conocimiento con amigos, vecinos y familiares.<br>
-          <span style="color:#16a34a; font-weight:700;">¡Ayúdanos a salvar vidas!</span>
+      const guardarBtn = document.getElementById('guardarBtn');
+      guardarBtn.disabled = true;
+
+      // Validaciones
+      if(!selectedGenero){
+        Swal.fire({
+          icon:'warning',
+          title:'Selecciona tu género',
+          text:'Por favor, selecciona una opción.',
+          confirmButtonText:'Editar',
+          width:'80%',
+          customClass:{ popup:'swal2-responsive-popup' }
+        }).then(()=> guardarBtn.disabled=false);
+        return;
+      }
+
+      if(!nombre || nombre.length < 5){
+        Swal.fire({
+          icon:'warning',
+          title:'Nombre Incompleto',
+          text:'Por favor, ingresa tu nombre completo.',
+          confirmButtonText:'Editar',
+          width:'80%',
+          customClass:{ popup:'swal2-responsive-popup' }
+        }).then(()=>{ document.getElementById('nombre').focus(); guardarBtn.disabled=false; });
+        return;
+      }
+
+      if(!documentoRegex.test(documento)){
+        Swal.fire({
+          icon:'warning',
+          title:'Documento Errado',
+          html:`Por favor, ingresa correctamente tu número de Documento<br><br>
+            <div class="copyright">Copyright © Oscar Polania – Sec. Tránsito del Tolima</div>`,
+          confirmButtonText:'Editar',
+          width:'80%',
+          customClass:{ popup:'swal2-responsive-popup' }
+        }).then(()=>{ document.getElementById('documento').focus(); guardarBtn.disabled=false; });
+        return;
+      }
+
+      if(dispositivo === 'SI'){
+        if(!correo){
+          Swal.fire({
+            icon:'warning',
+            title:'Correo Requerido',
+            text:'Por favor, ingresa el correo de uno de tus padres.',
+            confirmButtonText:'Editar'
+          }).then(()=>{ document.getElementById('correo').focus(); guardarBtn.disabled=false; });
+          return;
+        } else if(!correoRegex.test(correo)){
+          Swal.fire({
+            icon:'warning',
+            title:'Correo Errado',
+            html:`Por favor, ingresa un correo electrónico válido<br><br>
+              <div class="copyright">Copyright © Oscar Polania – Sec. Tránsito del Tolima</div>`,
+            confirmButtonText:'Editar',
+            width:'80%',
+            customClass:{ popup:'swal2-responsive-popup' }
+          }).then(()=>{ document.getElementById('correo').focus(); guardarBtn.disabled=false; });
+          return;
+        }
+      }
+
+      // Resumen
+      const htmlResumen = `
+        <div class="mb-2 text-lg text-green-700 font-bold">Resumen de tu Certificación</div>
+        <div><b>Nombre:</b> ${nombre}</div>
+        <div><b>Documento:</b> ${documento}</div>
+        <div><b>Género:</b> ${selectedGenero.valor}</div>
+        <div><b>¿En el dispositivo?:</b> ${dispositivo}</div>
+        ${dispositivo==='SI' ? `<div><b>Correo:</b> ${correo}</div>` : ''}
+      `;
+
+      Swal.fire({
+        icon:'info',
+        title:'¿Confirmar Certificación?',
+        html: htmlResumen,
+        showCancelButton:true,
+        confirmButtonText:'Confirmar',
+        cancelButtonText:'Editar'
+      }).then(result=>{
+        if(result.isConfirmed){
+          Swal.fire({
+            title:'Procesando Certificación...',
+            html:'Por favor espera unos segundos mientras termina el proceso.',
+            allowOutsideClick:false,
+            allowEscapeKey:false,
+            didOpen:()=>{
+              if(procesando) return;
+              procesando = true;
+              Swal.showLoading();
+
+              guardarDatosCertificado({
+                nombre,
+                documento,
+                dispositivo,
+                correo,
+                genero: selectedGenero.valor
+              });
+            }
+          });
+        } else {
+          guardarBtn.disabled = false;
+        }
+      });
+    }
+
+    /* -------------------------------------------------
+       ENVÍO AL APP SCRIPT
+    --------------------------------------------------- */
+    function guardarDatosCertificado(formData){
+      // Fecha formateada
+      const now = new Date();
+      const dia = String(now.getDate()).padStart(2,'0');
+      const mes = String(now.getMonth()+1).padStart(2,'0');
+      const anio = now.getFullYear();
+      const fecha = `${dia}/${mes}/${anio}`;
+
+      // Construir query params (evita preflight)
+      const params = new URLSearchParams({
+        fecha,
+        nombre: formData.nombre,
+        documento: formData.documento,
+        correo: formData.correo || "",
+        dia,
+        mes,
+        genero: formData.genero || ""
+      });
+
+      fetch(APP_SCRIPT_URL, {
+        method:'POST',
+        body: params
+      })
+      .then(r=>r.text())
+      .then(txt=>{
+        let data = {};
+        try { data = JSON.parse(txt); } catch(e) {}
+
+        if(data.success){
+          // Descargar PDF cuando no va por correo
+          if(!formData.correo && data.pdf){
+            const link = document.createElement('a');
+            link.href = 'data:application/pdf;base64,' + data.pdf;
+            link.download = data.filename || 'certificado.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+          mostrarCertificado(formData);
+        } else {
+          procesando = false;
+          Swal.fire({
+            icon:'error',
+            title:'Error al guardar',
+            text: data.error || 'No se pudo guardar.'
+          });
+        }
+      })
+      .catch(()=>{
+        procesando = false;
+        Swal.fire({
+          icon:'error',
+            title:'Error de conexión',
+          text:'No se pudo conectar con el servidor. Intenta en unos minutos.'
+        });
+      });
+    }
+
+    /* -------------------------------------------------
+       ALERTA DE ÉXITO Y VISTA FINAL
+    --------------------------------------------------- */
+    function mostrarCertificado(formData){
+      procesando = false;
+
+      const htmlBase = formData.correo
+        ? `Tu certificado ha sido enviado al correo: <b>${formData.correo}</b><br><br>`
+        : `Tu certificado se está descargando en tu dispositivo.<br><br>`;
+
+      Swal.fire({
+        icon:'success',
+        title:'¡Certificación Generada!',
+        html: `${htmlBase}
+          <div class="copyright">
+            Copyright © Oscar Polania – Sec. Tránsito del Tolima
+          </div>`,
+        confirmButtonText:'OK',
+        allowOutsideClick:false,
+        allowEscapeKey:false
+      }).then(()=>{
+        renderVistaFinal();
+      });
+    }
+
+    function renderVistaFinal(){
+      document.getElementById('app').innerHTML = `
+        <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center">
+          <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-2" />
+          <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-green-700">
+            ¡Misión Muy Importante!
+          </h2>
+          <p class="text-gray-700 leading-snug mb-4">
+            Ahora tu compromiso es compartir lo aprendido con tus amigos, vecinos y familiares.<br>
+            <span class="font-bold text-green-600">¡Ayúdanos a salvar vidas!</span>
+          </p>
+          <div class="mt-2 text-lg font-semibold text-emerald-700">
+            ¡Hasta Pronto!
+          </div>
+          <div class="copyright">
+            Copyright © Oscar Polania – Sec. Tránsito del Tolima
+          </div>
         </div>
-        <img src="${LOGO}" alt="Secretaría de Tránsito"
-             style="width:120px; max-width:42vw; border-radius:18px; box-shadow:0 4px 18px #0003;">
-        <div style="margin-top:6px; font-size:1.2rem; font-weight:700; color:#0f766e;">
-          ¡Hasta Pronto!
-        </div>
-        <div class="copyright" style="font-size:0.75rem; line-height:1rem; color:#888; margin-top:6px;">
-          Copyright © Oscar Polania – Sec. Tránsito del Tolima
-        </div>
-      </div>
-    `,
-    confirmButtonText: 'Finalizar',
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    width: '90%',
-    padding: '1.2rem',
-    customClass: { popup: 'swal2-responsive-popup' }
-  }).then(() => {
-    // Al cerrar esta alerta, mostramos la tercera vista fija y ahí termina todo.
-    renderVistaFinal();
-  });
-}
+      `;
+    }
 
-function renderVistaFinal() {
-  document.getElementById('app').innerHTML = `
-    <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center">
-      <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-2" />
-      <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-green-700">¡Misión Recibida!</h2>
-      <p class="text-gray-700 leading-snug mb-4">
-        Ahora tu compromiso es compartir lo aprendido con tus amigos, vecinos y familiares.<br>
-        <span class="font-bold text-green-600">¡Ayúdanos a salvar vidas!</span>
-      </p>
-      <div class="mt-2 text-lg font-semibold text-emerald-700">¡Hasta Pronto!</div>
-      <div class="copyright">
-        Copyright © Oscar Polania – Sec. Tránsito del Tolima
-      </div>
-    </div>
-  `;
-  // Opcional: limpiar confetti o sonidos, si hiciera falta
-}
-renderVistaInicial(); // <- ESTA LÍNEA ERA LA QUE FALTABA
-</script>
+    /* -------------------------------------------------
+       INICIO
+    --------------------------------------------------- */
+    renderVistaInicial();
+  </script>
 </body>
 </html>
