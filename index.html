@@ -428,30 +428,71 @@ function guardarDatosCertificado(formData) {
 }
 
 function mostrarCertificado(formData) {
-  if (formData.correo) {
-    Swal.fire({
-      icon: 'success',
-      title: '¡Certificación Generada!',
-      html: `Tu certificado ha sido enviado al correo: <b>${formData.correo}</b><br><br>
+  const htmlBase = formData.correo
+    ? `Tu certificado ha sido enviado al correo: <b>${formData.correo}</b><br><br>`
+    : `Tu certificado se está descargando en tu dispositivo.<br><br>`;
+
+  Swal.fire({
+    icon: 'success',
+    title: '¡Certificación Generada!',
+    html: `${htmlBase}
       <div class="copyright">
         Copyright © Oscar Polania – Sec. Tránsito del Tolima
       </div>`,
-      confirmButtonText: 'Finalizar'
-    });
-  } else {
-    Swal.fire({
-      icon: 'success',
-      title: '¡Certificación Generada!',
-      html: `Tu certificado se está descargando en tu dispositivo.<br><br>
-      <div class="copyright">
-        Copyright © Oscar Polania – Sec. Tránsito del Tolima
-      </div>`,
-      confirmButtonText: 'Finalizar'
-    });
-  }
+    confirmButtonText: 'OK'
+  }).then(() => {
+    mostrarMision(); // Ir a la segunda alerta (misión)
+  });
 }
 
-renderVistaInicial();
+function mostrarMision() {
+  Swal.fire({
+    title: '¡Ahora tienes una misión muy importante!',
+    html: `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+        <div style="font-size:1.05rem; line-height:1.35rem; font-weight:500; color:#374151; text-align:center;">
+          Compartir tu conocimiento con amigos, vecinos y familiares.<br>
+          <span style="color:#16a34a; font-weight:700;">¡Ayúdanos a salvar vidas!</span>
+        </div>
+        <img src="${LOGO}" alt="Secretaría de Tránsito"
+             style="width:120px; max-width:42vw; border-radius:18px; box-shadow:0 4px 18px #0003;">
+        <div style="margin-top:6px; font-size:1.2rem; font-weight:700; color:#0f766e;">
+          ¡Hasta Pronto!
+        </div>
+        <div class="copyright" style="font-size:0.75rem; line-height:1rem; color:#888; margin-top:6px;">
+          Copyright © Oscar Polania – Sec. Tránsito del Tolima
+        </div>
+      </div>
+    `,
+    confirmButtonText: 'Finalizar',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    width: '90%',
+    padding: '1.2rem',
+    customClass: { popup: 'swal2-responsive-popup' }
+  }).then(() => {
+    // Al cerrar esta alerta, mostramos la tercera vista fija y ahí termina todo.
+    renderVistaFinal();
+  });
+}
+
+function renderVistaFinal() {
+  document.getElementById('app').innerHTML = `
+    <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center">
+      <img src="${LOGO}" alt="Secretaría de Tránsito" class="tránsito-entity-img mb-2" />
+      <h2 class="text-2xl sm:text-3xl font-bold mb-4 text-green-700">¡Misión Recibida!</h2>
+      <p class="text-gray-700 leading-snug mb-4">
+        Ahora tu compromiso es compartir lo aprendido con tus amigos, vecinos y familiares.<br>
+        <span class="font-bold text-green-600">¡Ayúdanos a salvar vidas!</span>
+      </p>
+      <div class="mt-2 text-lg font-semibold text-emerald-700">¡Hasta Pronto!</div>
+      <div class="copyright">
+        Copyright © Oscar Polania – Sec. Tránsito del Tolima
+      </div>
+    </div>
+  `;
+  // Opcional: limpiar confetti o sonidos, si hiciera falta
+}
 </script>
 </body>
 </html>
