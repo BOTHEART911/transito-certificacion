@@ -381,24 +381,27 @@ function guardarDatosCertificado(formData) {
   const anio = fechaObj.getFullYear();
   const fecha = `${dia}/${mes}/${anio}`;
 
+  const params = new URLSearchParams({
+    fecha,
+    nombre: formData.nombre,
+    documento: formData.documento,
+    correo: formData.correo || "",
+    dia,
+    mes,
+    genero: formData.genero || ""
+  });
+
   fetch(APP_SCRIPT_URL, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      fecha: fecha,
-      nombre: formData.nombre,
-      documento: formData.documento,
-      correo: formData.correo || "",
-      dia: dia,
-      mes: mes,
-      genero: formData.genero || ""
-    })
+    body: params   // SIN headers -> NO preflight
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(r => r.text())     // Apps Script devuelve texto
+  .then(t => {
+    let data;
+    try { data = JSON.parse(t); } catch { data = {}; }
     mostrarCertificado(formData);
   })
-  .catch(()=>{
+  .catch(() => {
     Swal.fire({
       icon: 'error',
       title: 'Error de conexión',
