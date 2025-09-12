@@ -394,18 +394,6 @@
         }).then(()=>{ document.getElementById('documento').focus(); guardarBtn.disabled=false; });
         return;
       }
-
-      if(!selecteddispositivo){
-        Swal.fire({
-          icon:'warning',
-          title:'Selecciona sí estás en tu propio dispositivo',
-          text:'Por favor, selecciona una opción.',
-          confirmButtonText:'Editar',
-          width:'80%',
-          customClass:{ popup:'swal2-responsive-popup' }
-        }).then(()=> guardarBtn.disabled=false);
-        return;
-      } 
       
       if(dispositivo === 'NO'){
         if(!correo){
