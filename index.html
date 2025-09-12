@@ -331,9 +331,9 @@
         });
       });
 
-      // Mostrar correo solo si "SI"
+      // Mostrar correo solo si "NO"
       document.getElementById('dispositivo').addEventListener('change', function(){
-        document.getElementById('correoDiv').style.display = this.value === 'SI' ? '' : 'none';
+        document.getElementById('correoDiv').style.display = this.value === 'NO' ? '' : 'none';
       });
 
       // Click guardar
@@ -395,7 +395,7 @@
         return;
       }
 
-      if(dispositivo === 'SI'){
+      if(dispositivo === 'NO'){
         if(!correo){
           Swal.fire({
             icon:'warning',
