@@ -305,7 +305,7 @@
             <div id="correoDiv" style="display:none;">
               <label for="correo" class="field-label">Correo de uno de tus padres</label>
               <input type="email" id="correo" class="input" maxlength="60"
-                     placeholder="Corrobora con tus padres el correo" autocomplete="off">
+                     placeholder="Pregúntale el correo a uno de tus padres" autocomplete="off">
             </div>
             <button id="guardarBtn" type="button"
               class="game-btn bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-xl shadow-xl text-xl mt-2">
@@ -395,6 +395,18 @@
         return;
       }
 
+      if(!selecteddispositivo){
+        Swal.fire({
+          icon:'warning',
+          title:'Selecciona sí estás en tu propio dispositivo',
+          text:'Por favor, selecciona una opción.',
+          confirmButtonText:'Editar',
+          width:'80%',
+          customClass:{ popup:'swal2-responsive-popup' }
+        }).then(()=> guardarBtn.disabled=false);
+        return;
+      } 
+      
       if(dispositivo === 'NO'){
         if(!correo){
           Swal.fire({
