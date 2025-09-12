@@ -296,7 +296,7 @@
             </div>
             <div>
               <label for="dispositivo" class="field-label">¿Estás en tu Dispositivo?</label>
-              <select id="dispositivo" class="input">
+              <select id="dispositivo" class="input" required>
                 <option value="">Selecciona...</option>
                 <option value="SI">SI</option>
                 <option value="NO">NO</option>
@@ -394,6 +394,19 @@
         }).then(()=>{ document.getElementById('documento').focus(); guardarBtn.disabled=false; });
         return;
       }
+
+      // NUEVA VALIDACIÓN PARA "dispositivo"
+      if(!dispositivo){
+        Swal.fire({
+          icon:'warning',
+          title:'Selecciona una opción',
+          text:'Por favor indica si estás en tu dispositivo.',
+          confirmButtonText:'Editar',
+          width:'80%',
+          customClass:{ popup:'swal2-responsive-popup' }
+        }).then(()=>{ document.getElementById('dispositivo').focus(); guardarBtn.disabled=false; });
+        return;
+      }
       
       if(dispositivo === 'NO'){
         if(!correo){
@@ -418,14 +431,14 @@
         }
       }
 
-      // Resumen
+      // RESUMEN
       const htmlResumen = `
         <div class="mb-2 text-lg text-green-700 font-bold">Resumen de tu Certificación</div>
         <div><b>Nombre:</b> ${nombre}</div>
         <div><b>Documento:</b> ${documento}</div>
         <div><b>Género:</b> ${selectedGenero.valor}</div>
         <div><b>¿En el dispositivo?:</b> ${dispositivo}</div>
-        ${dispositivo==='SI' ? `<div><b>Correo:</b> ${correo}</div>` : ''}
+        ${dispositivo==='NO' ? `<div><b>Correo:</b> ${correo}</div>` : ''}
       `;
 
       Swal.fire({
