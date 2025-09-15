@@ -150,8 +150,8 @@
     const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwbP1t56uItBdurcPwQ4KNCrbWJWrJz7U-FpXdlUYiTKwsPXUQbt8Q0TuM83VrwWmE/exec";
 
     const GENEROS = [
-      { nombre:"Niño", valor:"Héroe",   img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png" },
-      { nombre:"Niña", valor:"Heroína", img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png" }
+      { nombre:"Niño", valor:"Guardián",   img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png" },
+      { nombre:"Niña", valor:"Guardiana", img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png" }
     ];
 
     // Flag para evitar dobles envíos mientras se procesa
@@ -199,7 +199,7 @@
             Haz terminado esta aventura vial
           </h1>
           <div class="mb-4 text-lg text-gray-700 text-center">
-            Es momento de certificarte como héroe o heroína vial.<br>
+            Es momento de certificarte como Guardián o Guardiana Digital de la Seguridad Vial.<br>
             Por favor ingresa tus <span class="font-bold text-green-600">3 códigos de ganador</span>
           </div>
           <form id="codigosForm" class="w-full flex flex-col gap-4 mb-5">
@@ -298,8 +298,8 @@
               <label for="dispositivo" class="field-label">¿Estás en tu Dispositivo o en tu casa?</label>
               <select id="dispositivo" class="input" required>
                 <option value="">Selecciona...</option>
-                <option value="SI">SI (Estoy usando mi propio dispositivo en casa)</option>
-                <option value="NO">NO (No es mi dispositivo o no estoy en casa)</option>
+                <option value="SI">SI (Estoy usando mi propio dispositivo)</option>
+                <option value="NO">NO (No es mi dispositivo)</option>
               </select>
             </div>
             <div id="correoDiv" style="display:none;">
