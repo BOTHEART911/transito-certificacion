@@ -150,8 +150,8 @@
     const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwbP1t56uItBdurcPwQ4KNCrbWJWrJz7U-FpXdlUYiTKwsPXUQbt8Q0TuM83VrwWmE/exec";
 
     const GENEROS = [
-      { nombre:"Niño", valor:"Guardián",   img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png" },
-      { nombre:"Niña", valor:"Guardiana", img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png" }
+      { nombre:"Hombre", valor:"Guardián",   img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_1_gjnwup.png" },
+      { nombre:"Mujer", valor:"Guardiana", img:"https://res.cloudinary.com/dqqeavica/image/upload/v1756828158/avatar_2_om3ufg.png" }
     ];
 
     // Flag para evitar dobles envíos mientras se procesa
@@ -290,6 +290,14 @@
                      placeholder="Ingresa tu nombre completo" autocomplete="off">
             </div>
             <div>
+              <label for="td" class="field-label">Tipo de Documento</label>
+              <select id="td" class="input" required>
+                <option value="">Selecciona...</option>
+                <option value="T.I.">T.I.</option>
+                <option value="C.C.">C.C.</option>
+              </select>
+            </div>
+            <div>
               <label for="documento" class="field-label">N° de Documento</label>
               <input type="number" id="documento" class="input" maxlength="10"
                      placeholder="Sin puntos ni espacios" autocomplete="off">
@@ -350,6 +358,7 @@
       const documento   = document.getElementById('documento').value.trim();
       const dispositivo = document.getElementById('dispositivo').value;
       const correo      = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
+      const td = document.getElementById('td').value;
 
       const documentoRegex = /^[0-9]{10}$/;
       const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -381,6 +390,19 @@
         }).then(()=>{ document.getElementById('nombre').focus(); guardarBtn.disabled=false; });
         return;
       }
+
+      // validar selección obligatoria
+        if(!td){
+          Swal.fire({
+            icon:'warning',
+            title:'Selecciona el tipo de documento',
+            text:'Por favor, selecciona T.I. o C.C.',
+            confirmButtonText:'Editar',
+            width:'80%',
+            customClass:{ popup:'swal2-responsive-popup' }
+          }).then(()=>{ document.getElementById('td').focus(); guardarBtn.disabled=false; });
+          return;
+        }
 
       if(!documentoRegex.test(documento)){
         Swal.fire({
@@ -435,7 +457,7 @@
       const htmlResumen = `
         <div class="mb-2 text-lg text-green-700 font-bold">Resumen de tu Certificación</div>
         <div><b>Nombre:</b> ${nombre}</div>
-        <div><b>Documento:</b> ${documento}</div>
+        <div><b>Documento:</b> ${td} ${documento}</div>
         <div><b>Género:</b> ${selectedGenero.valor}</div>
         <div><b>¿En el dispositivo?:</b> ${dispositivo}</div>
         ${dispositivo==='NO' ? `<div><b>Correo:</b> ${correo}</div>` : ''}
@@ -494,7 +516,8 @@
         correo: formData.correo || "",
         dia,
         mes,
-        genero: formData.genero || ""
+        genero: formData.genero || "",
+         td
       });
 
       fetch(APP_SCRIPT_URL, {
