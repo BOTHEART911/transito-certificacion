@@ -355,10 +355,11 @@
     --------------------------------------------------- */
     function validarYResumen(selectedGenero){
       const nombre      = document.getElementById('nombre').value.trim().toUpperCase();
+      const td =  document.getElementById('td').value;
       const documento   = document.getElementById('documento').value.trim();
       const dispositivo = document.getElementById('dispositivo').value;
       const correo      = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
-      const td = (document.getElementById('td').value || '').trim();
+      
 
       const documentoRegex = /^[0-9]{10}$/;
       const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -484,11 +485,11 @@
 
               guardarDatosCertificado({
                 nombre,
+                td,
                 documento,
                 dispositivo,
                 correo,
                 genero: selectedGenero.valor
-                td
               });
             }
           });
@@ -513,12 +514,12 @@
       const params = new URLSearchParams({
         fecha,
         nombre: formData.nombre,
+        td: formData.td,
         documento: formData.documento,
         correo: formData.correo || "",
         dia,
         mes,
-        genero: formData.genero || "",
-         td: formData.td || ""
+        genero: formData.genero || ""
       });
 
       fetch(APP_SCRIPT_URL, {
