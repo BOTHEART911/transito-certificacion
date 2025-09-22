@@ -358,7 +358,7 @@
       const documento   = document.getElementById('documento').value.trim();
       const dispositivo = document.getElementById('dispositivo').value;
       const correo      = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
-      const td = document.getElementById('td').value;
+      const td = document.getElementById('td').value.trim() : "";
 
       const documentoRegex = /^[0-9]{10}$/;
       const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -517,7 +517,7 @@
         dia,
         mes,
         genero: formData.genero || "",
-         td
+         td: formData.td
       });
 
       fetch(APP_SCRIPT_URL, {
