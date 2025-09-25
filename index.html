@@ -361,7 +361,7 @@
       const correo      = document.getElementById('correo') ? document.getElementById('correo').value.trim() : "";
       
 
-      const documentoRegex = /^[0-9]{10}$/;
+      const documentoRegex = /^(?:[0-9]{6,9}|1[0-9]{9})$/;
       const correoRegex = /^[^\s@]+@(example\.org|nomedominio\.net|dominio\.edu\.co|examplo\.edu\.co|empresa\.com|nombreempresa\.org|correo\.es|dominio\.es|outlook\.com|hotmail\.com|live\.com|gmail\.com|icloud\.com|me\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
 
       const guardarBtn = document.getElementById('guardarBtn');
